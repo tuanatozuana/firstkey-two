@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çiftlik Sahnesi</title>
+<style>
+    :root {
+        --room-size: min(70.71vw, 70.71vh);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+        background: #142814; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        overflow: hidden; 
+        user-select: none;
+        font-family: Arial, sans-serif;
+    }
+
+    /* ÇİFTLİK SAHNESİ */
+    .room {
+        position: relative;
+        width: var(--room-size);
+        height: var(--room-size);
+        transform-style: preserve-3d;
+        transform: rotateX(60deg) rotateZ(45deg);
+    }
+
+    .panel {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0; 
+        border: 2px solid #0d1a0d;
+    }
+
+    /* ÇİM ZEMİN */
+    .floor { 
+        background: #3a6644; 
+        background-image: 
+            radial-gradient(#2d5235 15%, transparent 16%),
+            radial-gradient(#4a7c56 15%, transparent 16%);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
+        transform-style: preserve-3d;
+    }
+
+    /* SOL AHŞAP DUVAR VE DİKEY KAPI */
+    .left-wall { 
+        background: #2b1810; 
+        transform: rotateY(-90deg); 
+        transform-style: preserve-3d;
+        background-image: repeating-linear-gradient(0deg, #3d2217 0px, #3d2217 12px, #1a0c07 13px, #1a0c07 15px);
+    }
+
+    /* SOL DUVARDAKİ DİKEY KAPI */
+    .door-wrapper {
+        position: absolute;
+        left: 10%;
+        top: 30%;
+        width: 26%;
+        height: 75%;
+        transform: scaleY(-1) rotate(90deg);
+        transform-origin: center center;
+    }
+    
+    .door-container {
+        width: 100%;
+        height: 100%;
+        background: #3d200d;
+        padding: 5px;
+        border: 2px solid #1a0c05;
+        box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        transition: filter 0.15s ease, transform 0.15s ease;
+    }
+
+    .door-container:hover {
+        filter: brightness(1.15);
+    }
+
+    .door-panel {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #ff85a1;
+        border: 2px solid #b54a6b;
+        border-radius: 2px;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .door-handle {
+        position: absolute;
+        left: 12%;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        background: #ffb703;
+        border: 1px solid #7a5200;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /* SAĞ ÇİFTLİK DUVARI */
+    .right-wall { 
+        background: #3d2217; 
+        transform: rotateX(90deg); 
+        transform-style: preserve-3d;
+        background-image: repeating-linear-gradient(90deg, #4a2a1d 0px, #4a2a1d 20px, #26140c 21px, #26140c 23px);
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    /* SAĞ DUVARDAKİ HAYVAN PANOLARI */
+    .farm-board {
+        position: absolute;
+        width: 25%;
+        height: 25%;
+        background: #8b5a2b;
+        border: 3px solid #4a2e12;
+        border-radius: 8px;
+        box-shadow: -3px 5px 8px rgba(0,0,0,0.4);
+        transform: scaleY(-1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .farm-board:hover {
+        filter: brightness(1.2);
+        transform: scaleY(-1) scale(1.06);
+    }
+
+    .farm-board::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        width: 6px;
+        height: 8px;
+        background: #2b1810;
+        border-radius: 2px;
+    }
+
+    .farm-board .icon { font-size: 26px; }
+    .farm-board .label { font-size: 11px; color: #ffe6a7; font-weight: bold; margin-top: 4px; text-shadow: 1px 1px 2px #000; }
+
+    /* DUVAR PANOLARININ YERLEŞİMİ */
+    .board-at      { top: 18%; left: 8%; }
+    .board-zurafa  { top: 18%; left: 38%; }
+    .board-tavsan  { top: 18%; left: 68%; }
+    .board-kedi    { top: 55%; left: 8%; }
+    .board-kopek   { top: 55%; left: 38%; }
+    .board-tilki   { top: 55%; left: 68%; }
+
+    /* ZEMİNDEKİ AĞAÇ */
+    .tree-wrapper {
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        transform: scaleY(-1) rotate(-45deg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        pointer-events: none;
+    }
+
+    .tree-emoji {
+        font-size: 80px;
+        filter: drop-shadow(4px 10px 8px rgba(0, 0, 0, 0.5));
+        animation: sway 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes sway {
+        0% { transform: rotate(-2deg); }
+        100% { transform: rotate(2deg); }
+    }
+
+    /* KAPI YANINDAKİ İZOMETRİK 3D MASA / TEZGAH */
+    .farm-table {
+        position: absolute;
+        top: 35%;
+        left: 2%;
+        width: 8%;   /* Odadan içeri derinliği inceltildi */
+        height: 20%;  /* Duvar boyunca uzunluğu kısaltıldı */
+        transform-style: preserve-3d;
+        z-index: 6;
+    }
+
+    /* Masanın Gölgesi */
+    .table-shadow {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.45);
+        filter: blur(4px);
+        transform: translate(4px, 4px);
+    }
+
+    /* Masa Üst Tablası */
+    .table-top {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #8b5a2b;
+        border: 2px solid #3d2217;
+        transform: translateZ(24px); /* Masa yüksekliği düşürüldü */
+        background-image: repeating-linear-gradient(0deg, #8b5a2b 0px, #8b5a2b 8px, #724720 9px, #724720 10px);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Masa Ön Dik Yüzeyi */
+    .table-front {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 24px;
+        background: #5c3a1e;
+        border: 2px solid #2b1810;
+        transform-origin: bottom center;
+        transform: rotateX(-90deg);
+    }
+
+    /* Masa Yan Dik Yüzeyi */
+    .table-side {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 24px;
+        height: 100%;
+        background: #4a2e12;
+        border: 2px solid #1a0c07;
+        transform-origin: right center;
+        transform: rotateY(90deg);
+    }
+
+    /* SAHNEYE İNEN HAYVANLAR */
+    .placed-animal {
+        position: absolute;
+        transform: scaleY(-1) rotate(-90deg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .placed-animal .pet-img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        filter: drop-shadow(2px 5px 6px rgba(0,0,0,0.5));
+        animation: float 2.5s infinite alternate ease-in-out;
+    }
+
+    .placed-animal .name-tag {
+        background: #2b1810;
+        color: #ffe6a7;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: bold;
+        border: 1px solid #8b5a2b;
+        white-space: nowrap;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        margin-top: 2px;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-6px); }
+    }
+
+    /* SAHİPLENME MODALI */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-card { background: #2b1810; border: 2px solid #8b5a2b; border-radius: 12px; padding: 20px; width: 280px; text-align: center; color: #fff; }
+    .modal-title { font-size: 16px; margin-bottom: 12px; color: #ffe6a7; text-transform: uppercase; }
+    .pass-input { width: 100%; padding: 8px; font-size: 16px; text-align: center; border-radius: 4px; border: 1px solid #633e18; background: #1a0c07; color: #fff; margin-bottom: 12px; }
+    .modal-buttons { display: flex; gap: 8px; }
+    .btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save { background: #ffe6a7; color: #2b1810; }
+    .btn-close { background: #4a2e12; color: #fff; }
+</style>
+</head>
+<body>
+
+    <div class="room">
+        <!-- ÇİM ZEMİN -->
+        <div class="panel floor" id="farmFloor">
+            
+            <!-- KAPI YANINDAKİ 3D AHŞAP TEZGAH/MASA -->
+            <div class="farm-table">
+                <div class="table-shadow"></div>
+                <div class="table-front"></div>
+                <div class="table-side"></div>
+                <div class="table-top"></div>
+            </div>
+
+            <!-- AĞAÇ -->
+            <div class="tree-wrapper">
+                <span class="tree-emoji">🌳</span>
+            </div>
+
+        </div>
+
+        <!-- SOL DUVAR VE DİKEY KAPI -->
+        <div class="panel left-wall">
+            <div class="door-wrapper">
+                <div class="door-container" onclick="goBack()">
+                    <div class="door-panel">
+                        <div class="door-handle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ DUVAR VE HAYVAN SEÇİM PANOLARI -->
+        <div class="panel right-wall">
+            <div class="farm-board board-at" onclick="openAdoptModal('At', 'at.png')">
+                <span class="icon">🐴</span>
+                <span class="label">At</span>
+            </div>
+            <div class="farm-board board-zurafa" onclick="openAdoptModal('Zürafa', 'zurafa.png')">
+                <span class="icon">🦒</span>
+                <span class="label">Zürafa</span>
+            </div>
+            <div class="farm-board board-tavsan" onclick="openAdoptModal('Tavşan', 'tavsan.png')">
+                <span class="icon">🐰</span>
+                <span class="label">Tavşan</span>
+            </div>
+            <div class="farm-board board-kedi" onclick="openAdoptModal('Kedi', 'kedi.png')">
+                <span class="icon">🐱</span>
+                <span class="label">Kedi</span>
+            </div>
+            <div class="farm-board board-kopek" onclick="openAdoptModal('Köpek', 'kopek.png')">
+                <span class="icon">🐶</span>
+                <span class="label">Köpek</span>
+            </div>
+            <div class="farm-board board-tilki" onclick="openAdoptModal('Tilki', 'tilki.png')">
+                <span class="icon">🦊</span>
+                <span class="label">Tilki</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- İSİMLENDİRME MODALI -->
+    <div class="modal-overlay" id="adoptModal">
+        <div class="modal-card">
+            <div class="modal-title" id="modalTitle">Hayvan Sahiplen</div>
+            <input type="text" id="petNameInput" class="pass-input" placeholder="İsim Giriniz" maxlength="12">
+            <div class="modal-buttons">
+                <button class="btn btn-save" onclick="confirmAdoption()">Sahiplen</button>
+                <button class="btn btn-close" onclick="closeAdoptModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedType = '';
+        let selectedImage = '';
+        let pets = JSON.parse(localStorage.getItem('farmPets') || '[]');
+        const farmFloor = document.getElementById('farmFloor');
+
+        function renderPets() {
+            const existingPets = farmFloor.querySelectorAll('.placed-animal');
+            existingPets.forEach(el => el.remove());
+
+            pets.forEach(pet => {
+                const petEl = document.createElement('div');
+                petEl.className = 'placed-animal';
+                petEl.style.top = pet.top;
+                petEl.style.left = pet.left;
+                petEl.innerHTML = `
+                    <img src="${pet.image}" alt="${pet.name}" class="pet-img">
+                    <span class="name-tag">${pet.name}</span>
+                `;
+                farmFloor.appendChild(petEl);
+            });
+        }
+
+        function openAdoptModal(type, imageFile) {
+            selectedType = type;
+            selectedImage = imageFile;
+            document.getElementById('modalTitle').textContent = `${type} Sahiplen`;
+            document.getElementById('petNameInput').value = '';
+            document.getElementById('adoptModal').style.display = 'flex';
+        }
+
+        function closeAdoptModal() {
+            document.getElementById('adoptModal').style.display = 'none';
+        }
+
+        function confirmAdoption() {
+            const name = document.getElementById('petNameInput').value.trim();
+            if (!name) return;
+
+            const randomTop = Math.floor(Math.random() * 35 + 40) + '%';
+            const randomLeft = Math.floor(Math.random() * 35 + 35) + '%';
+
+            pets.push({
+                type: selectedType,
+                image: selectedImage,
+                name: name,
+                top: randomTop,
+                left: randomLeft
+            });
+
+            localStorage.setItem('farmPets', JSON.stringify(pets));
+            renderPets();
+            closeAdoptModal();
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        renderPets();
+    </script>
+</body>
+</html>
