@@ -192,8 +192,8 @@
         position: absolute;
         top: 35%;
         left: 2%;
-        width: 8%;   /* Odadan içeri derinliği inceltildi */
-        height: 20%;  /* Duvar boyunca uzunluğu kısaltıldı */
+        width: 10%;  
+        height: 24px; 
         transform-style: preserve-3d;
         z-index: 6;
     }
@@ -215,9 +215,25 @@
         height: 100%;
         background: #8b5a2b;
         border: 2px solid #3d2217;
-        transform: translateZ(24px); /* Masa yüksekliği düşürüldü */
-        background-image: repeating-linear-gradient(0deg, #8b5a2b 0px, #8b5a2b 8px, #724720 9px, #724720 10px);
+        transform: translateZ(30vw); 
+        background-image: repeating-linear-gradient(90deg, #8b5a2b 0px, #8b5a2b 8px, #724720 9px, #724720 10px);
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        transform-style: preserve-3d;
+    }
+
+    /* MASA ÜSTÜNDEKİ WINNIE THE POOH */
+    .table-pooh {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 45px;
+        height: 45px;
+        object-fit: contain;
+        /* İzometrik açı düzeltmesi ve masanın tam ortasına hizalama */
+        transform: translate(-50%, -50%) rotate(-45deg) rotateX(-60deg) scaleY(1.2);
+        transform-origin: center bottom;
+        filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.5));
+        pointer-events: none;
     }
 
     /* Masa Ön Dik Yüzeyi */
@@ -226,7 +242,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 24px;
+        height: 30vw; 
         background: #5c3a1e;
         border: 2px solid #2b1810;
         transform-origin: bottom center;
@@ -238,7 +254,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 24px;
+        width: 30vw; 
         height: 100%;
         background: #4a2e12;
         border: 2px solid #1a0c07;
@@ -305,7 +321,10 @@
                 <div class="table-shadow"></div>
                 <div class="table-front"></div>
                 <div class="table-side"></div>
-                <div class="table-top"></div>
+                <div class="table-top">
+                    <!-- MASA ÜSTÜNDEKİ WINNIE THE POOH -->
+                    <img src="Winniethepooh.png" alt="Winnie the Pooh" class="table-pooh">
+                </div>
             </div>
 
             <!-- AĞAÇ -->
