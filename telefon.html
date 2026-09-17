@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telefon - Mini Oyunlar</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        /* Telefon Kasası */
+        #phone {
+            width: 360px; height: 640px;
+            background: url('duvar-kagidi.jpg') no-repeat center center;
+            background-size: cover;
+            border: 12px solid #333;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* Ekran Katmanları */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white; display: none; flex-direction: column; align-items: center;
+        }
+        .active { display: flex; }
+
+        /* Kilit Ekranı */
+        #lock-screen { justify-content: center; backdrop-filter: blur(5px); }
+        #lock-screen input { padding: 10px; border-radius: 10px; border: none; text-align: center; margin-bottom: 10px; font-size: 18px; width: 60%; }
+        #lock-screen button { padding: 10px 20px; border-radius: 10px; border: none; background: #007bff; color: white; cursor: pointer; font-size: 16px;}
+
+        /* Ana Ekran */
+        #home-screen { padding-top: 50px; background: rgba(0, 0, 0, 0.4); }
+        .score-board { background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 20px; margin-bottom: 30px; font-weight: bold; }
+        .apps { display: flex; flex-direction: column; gap: 15px; width: 80%; }
+        .app-icon { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); font-size: 18px; font-weight: bold; transition: 0.2s;}
+        .app-icon:hover { background: rgba(255,255,255,0.4); }
+
+        /* Oyun Ortak UI */
+        .game-header { width: 100%; padding: 15px; display: flex; justify-content: space-between; background: rgba(0,0,0,0.8); align-items: center;}
+        .back-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+
+        /* Oyun 4 (Eşleştirme) */
+        #game4-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; width: 100%; }
+        .card { width: 100%; aspect-ratio: 3/4; background: #555; border-radius: 8px; cursor: pointer; background-size: cover; background-position: center; }
+        
+        /* Oyun 3 (Bul Karayı Al Parayı) */
+        #game3-area { display: flex; justify-content: center; gap: 10px; padding: 20px; width: 100%; margin-top: 50px; }
+        .card3 { width: 30%; aspect-ratio: 2/3; background: url('3/kart-arka-yuz.png'); background-size: cover; border-radius: 10px; cursor: pointer; transition: transform 0.5s; }
+        .msg-text { margin-top: 20px; font-size: 18px; text-align: center; padding: 0 10px; }
+
+        /* Oyun 2 (Gece/Gündüz) */
+        #game2-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; width: 100%; }
+        .char-box { text-align: center; font-size: 12px; }
+        .char-img { width: 100%; aspect-ratio: 1; background-size: cover; border-radius: 5px; background-color: #333; }
+        #g2-command { font-size: 32px; font-weight: bold; margin: 20px 0; letter-spacing: 2px;}
+        .g2-controls { display: flex; gap: 20px; margin-top: 20px; }
+        .g2-btn { padding: 15px 30px; font-size: 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold;}
+        #btn-gunduz { background: #f1c40f; color: black; }
+        #btn-gece { background: #2c3e50; color: white; }
+
+    </style>
+</head>
+<body>
+
+<div id="phone">
+    <!-- KİLİT EKRANI -->
+    <div id="lock-screen" class="screen active">
+        <h2>🔒 Telefon Kilitli</h2><br>
+        <input type="password" id="passInput" placeholder="Şifre">
+        <button onclick="checkPassword()">Kilidi Aç</button>
+    </div>
+
+    <!-- ANA EKRAN -->
+    <div id="home-screen" class="screen">
+        <div class="score-board">Toplam Puan: <span id="totalScore">0</span></div>
+        <div class="apps">
+            <div class="app-icon" onclick="initGame4()">4. Hafıza Kartları</div>
+            <div class="app-icon" onclick="initGame3()">3. Bul Karayı</div>
+            <div class="app-icon" onclick="initGame2()">2. Gece & Gündüz</div>
+            <div class="app-icon" onclick="alert('1 nolu oyun yakında eklenecek!')">1. Oyun</div>
+        </div>
+    </div>
+
+    <!-- OYUN 4 EKRANI -->
+    <div id="game4-screen" class="screen">
+        <div class="game-header">
+            <span>Oyun 4</span>
+            <button class="back-btn" onclick="showScreen('home-screen')">Geri</button>
+        </div>
+        <div id="game4-grid"></div>
+    </div>
+
+    <!-- OYUN 3 EKRANI -->
+    <div id="game3-screen" class="screen">
+        <div class="game-header">
+            <span>Oyun 3</span>
+            <button class="back-btn" onclick="showScreen('home-screen')">Geri</button>
+        </div>
+        <div id="game3-area"></div>
+        <div class="msg-text" id="g3-msg">Hedef kartı (bugun.jpg) bul!</div>
+    </div>
+
+    <!-- OYUN 2 EKRANI -->
+    <div id="game2-screen" class="screen">
+        <div class="game-header">
+            <span>Oyun 2</span>
+            <button class="back-btn" onclick="endGame2()">Geri</button>
+        </div>
+        <div id="g2-command">BAŞLIYOR...</div>
+        <div id="game2-grid"></div>
+        <div class="g2-controls">
+            <button id="btn-gunduz" class="g2-btn" onclick="setZuanaState('gunduz')">GÜNDÜZ</button>
+            <button id="btn-gece" class="g2-btn" onclick="setZuanaState('gece')">GECE</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let totalScore = 0;
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- ŞİFRE KONTROLÜ ---
+    async function checkPassword() {
+        let input = document.getElementById('passInput').value;
+        try {
+            let res = await fetch('password.txt');
+            let pass = await res.text();
+            if(input === pass.trim()) {
+                showScreen('home-screen');
+            } else {
+                alert("Yanlış Şifre!");
+            }
+        } catch(e) {
+            console.warn("Dosya okunamadı. Test şifresi '1234' deneniyor.");
+            if(input === '1234') {
+                showScreen('home-screen');
+            } else {
+                alert("Yerel sunucu algılanamadı ve test şifresi de (1234) yanlış!");
+            }
+        }
+    }
+
+    function addScore(points) {
+        totalScore += points;
+        document.getElementById('totalScore').innerText = totalScore;
+        alert(`Tebrikler! ${points} Puan Kazandın. Toplam Puan: ${totalScore}`);
+        showScreen('home-screen');
+    }
+
+    // --- OYUN 4: HAFIZA KARTI ---
+    let g4_images = ['4/besinci-mevsim.jpg', '4/yanlis-kart.png', '4/kis.jpeg', '4/yaz.jpg', '4/ilkbahar.jpg', '4/sonbahar.jpg'];
+    let g4_cards = [];
+    let g4_flipped = [];
+    let g4_matchedCount = 0;
+
+    function initGame4() {
+        showScreen('game4-screen');
+        g4_flipped = [];
+        g4_matchedCount = 0;
+        let grid = document.getElementById('game4-grid');
+        grid.innerHTML = '';
+        
+        // Kartları çiftle ve karıştır
+        g4_cards = [...g4_images, ...g4_images].sort(() => Math.random() - 0.5);
+
+        g4_cards.forEach((src, index) => {
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.src = src;
+            card.dataset.index = index;
+            card.style.backgroundImage = "url('3/kart-arka-yuz.png')"; // Kapalı yüz
+            card.onclick = () => flipCard4(card);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard4(card) {
+        if (g4_flipped.length >= 2 || g4_flipped.includes(card) || card.classList.contains('matched')) return;
+
+        card.style.backgroundImage = `url('${card.dataset.src}')`;
+        g4_flipped.push(card);
+
+        if (g4_flipped.length === 2) {
+            setTimeout(checkMatch4, 500);
+        }
+    }
+
+    function checkMatch4() {
+        let card1 = g4_flipped[0];
+        let card2 = g4_flipped[1];
+        let src1 = card1.dataset.src;
+        let src2 = card2.dataset.src;
+
+        if (src1 === src2) {
+            if (src1.includes('yanlis-kart.png')) {
+                // Sadece yanlis-kart eşleşirse oyun baştan başlar
+                alert("Yanlış kartlar eşleşti! Oyun baştan başlıyor.");
+                initGame4();
+            } else {
+                // Diğer doğru eşleşmelerde oyun devam eder
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                g4_matchedCount += 2;
+                g4_flipped = [];
+                if (g4_matchedCount === g4_cards.length) addScore(4);
+            }
+        } else {
+            // Eşleşmeyen kartlar tekrar kapanır
+            card1.style.backgroundImage = "url('3/kart-arka-yuz.png')";
+            card2.style.backgroundImage = "url('3/kart-arka-yuz.png')";
+            g4_flipped = [];
+        }
+    }
+
+    // --- OYUN 3: BUL KARAYI ---
+    let g3_images = ['3/yarin.jpg', '3/bugun.jpg', '3/dun.jpg'];
+    let targetCard = '3/bugun.jpg';
+    let g3_canClick = false;
+
+    function initGame3() {
+        showScreen('game3-screen');
+        let area = document.getElementById('game3-area');
+        let msg = document.getElementById('g3-msg');
+        area.innerHTML = '';
+        g3_canClick = false;
+        msg.innerText = "Kartlara iyi bak, BUGÜN'ü bulacaksın...";
+
+        let shuffled = [...g3_images].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach((src, i) => {
+            let c = document.createElement('div');
+            c.className = 'card3';
+            c.style.backgroundImage = `url('${src}')`;
+            c.dataset.src = src;
+            c.onclick = () => pickCard3(c);
+            area.appendChild(c);
+        });
+
+        setTimeout(() => {
+            msg.innerText = "Karıştırılıyor...";
+            let cardsDom = document.querySelectorAll('.card3');
+            cardsDom.forEach(c => c.style.backgroundImage = "url('3/kart-arka-yuz.png')");
+            
+            setTimeout(() => {
+                for (let i = area.children.length; i >= 0; i--) {
+                    area.appendChild(area.children[Math.random() * i | 0]);
+                }
+                msg.innerText = "Hangi kart BUGÜN?";
+                g3_canClick = true;
+            }, 1000);
+        }, 2000);
+    }
+
+    function pickCard3(card) {
+        if (!g3_canClick) return;
+        card.style.backgroundImage = `url('${card.dataset.src}')`;
+        g3_canClick = false;
+
+        setTimeout(() => {
+            if (card.dataset.src === targetCard) {
+                addScore(3);
+            } else {
+                alert("Yanlış kart! Baştan başlıyor.");
+                initGame3();
+            }
+        }, 500);
+    }
+
+    // --- OYUN 2: GECE GÜNDÜZ ---
+    let chars = ['cahit', 'zuana', 'fare', 'keci', 'kedi', 'tavsan', 'zurafa', 'horoz'];
+    let g2_interval;
+    let g2_currentCommand = '';
+    let zuanaState = 'gunduz';
+    
+    function initGame2() {
+        showScreen('game2-screen');
+        renderGame2Grid();
+        zuanaState = 'gunduz';
+        document.getElementById('g2-command').innerText = "HAZIR OL...";
+        setTimeout(nextRound2, 2000);
+    }
+
+    function renderGame2Grid() {
+        let grid = document.getElementById('game2-grid');
+        grid.innerHTML = '';
+        chars.forEach(c => {
+            let div = document.createElement('div');
+            div.className = 'char-box';
+            div.innerHTML = `<div class="char-img" id="img-${c}" style="background-image:url('2/${c}-gunduz.png')"></div><br>${c.toUpperCase()}`;
+            grid.appendChild(div);
+        });
+    }
+
+    function setZuanaState(state) {
+        zuanaState = state;
+        document.getElementById('img-zuana').style.backgroundImage = `url('2/zuana-${state}.png')`;
+    }
+
+    function nextRound2() {
+        if(!document.getElementById('game2-screen').classList.contains('active')) return;
+
+        g2_currentCommand = Math.random() > 0.5 ? 'gunduz' : 'gece';
+        let cmdText = document.getElementById('g2-command');
+        cmdText.innerText = g2_currentCommand === 'gunduz' ? "☀️ GÜNDÜZ" : "🌙 GECE";
+        cmdText.style.color = g2_currentCommand === 'gunduz' ? "#f1c40f" : "#fff";
+
+        chars.forEach(c => {
+            if (c === 'zuana') return;
+            let charState = Math.random() > 0.1 ? g2_currentCommand : (g2_currentCommand === 'gunduz' ? 'gece' : 'gunduz');
+            document.getElementById(`img-${c}`).style.backgroundImage = `url('2/${c}-${charState}.png')`;
+        });
+
+        g2_interval = setTimeout(checkSurvival2, 1500);
+    }
+
+    function checkSurvival2() {
+        if(!document.getElementById('game2-screen').classList.contains('active')) return;
+
+        if (zuanaState !== g2_currentCommand) {
+            alert("Yanlış hamle! Zuana elendi. Oyun Bitti!");
+            endGame2();
+        } else {
+            nextRound2();
+        }
+    }
+
+    function endGame2() {
+        clearTimeout(g2_interval);
+        showScreen('home-screen');
+    }
+</script>
+</body>
+</html>
