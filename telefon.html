@@ -34,11 +34,40 @@
         #lock-screen button { padding: 10px 20px; border-radius: 10px; border: none; background: #007bff; color: white; cursor: pointer; font-size: 16px;}
 
         /* Ana Ekran */
-        #home-screen { padding-top: 50px; background: rgba(0, 0, 0, 0.4); }
-        .score-board { background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 20px; margin-bottom: 30px; font-weight: bold; }
-        .apps { display: flex; flex-direction: column; gap: 15px; width: 80%; }
-        .app-icon { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); font-size: 18px; font-weight: bold; transition: 0.2s;}
+        #home-screen { padding-top: 40px; background: rgba(0, 0, 0, 0.4); }
+        .score-board { background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 20px; margin-bottom: 20px; font-weight: bold; }
+        .apps { display: flex; flex-direction: column; gap: 12px; width: 85%; }
+        .app-icon { background: rgba(255,255,255,0.2); padding: 12px; border-radius: 15px; text-align: center; cursor: pointer; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); font-size: 16px; font-weight: bold; transition: 0.2s;}
         .app-icon:hover { background: rgba(255,255,255,0.4); }
+
+        /* Mavi Kalp Barı */
+        .heart-bar {
+            margin-top: 10px;
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(0, 123, 255, 0.2);
+            border: 2px solid rgba(0, 123, 255, 0.4);
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: not-allowed;
+            opacity: 0.7;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        .heart-bar.unlocked {
+            background: rgba(0, 123, 255, 0.7);
+            border-color: #007bff;
+            opacity: 1;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
 
         /* Oyun Ortak UI */
         .game-header { width: 100%; padding: 15px; display: flex; justify-content: space-between; background: rgba(0,0,0,0.8); align-items: center;}
@@ -48,7 +77,7 @@
         #game4-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; width: 100%; max-height: 520px; overflow-y: auto; }
         .card { width: 100%; aspect-ratio: 3/5; background: #555; border-radius: 8px; cursor: pointer; background-size: cover; background-position: center; }
         
-        /* Oyun 3 (Bul Karayı Al Parayı) - 9:16 Dikey Oran & Animasyon */
+        /* Oyun 3 (Bul Karayı Al Parayı) */
         #game3-area { display: flex; justify-content: center; gap: 12px; padding: 20px; width: 100%; margin-top: 30px; }
         .card3 { width: 28%; aspect-ratio: 9/16; background: url('kart-arka-yuz.png'); background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; transition: transform 0.4s ease-in-out; }
         .shuffling { animation: shuffleAnim 0.4s ease-in-out infinite alternate; }
@@ -59,7 +88,7 @@
         }
         .msg-text { margin-top: 20px; font-size: 18px; text-align: center; padding: 0 10px; }
 
-        /* Oyun 2 (Gece/Gündüz) - Elenme & Siyah-Beyaz Efekti */
+        /* Oyun 2 (Gece/Gündüz) */
         #game2-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; width: 100%; }
         .char-box { text-align: center; font-size: 11px; font-weight: bold; }
         .char-img { width: 100%; aspect-ratio: 3/5; background-size: cover; background-position: center; border-radius: 6px; background-color: #333; transition: filter 0.5s ease, opacity 0.5s ease; }
@@ -86,10 +115,27 @@
     <div id="home-screen" class="screen">
         <div class="score-board">Toplam Puan: <span id="totalScore">0</span></div>
         <div class="apps">
-            <div class="app-icon" onclick="initGame4()">4. Hafıza Kartları</div>
-            <div class="app-icon" onclick="initGame3()">3. Bul Karayı</div>
-            <div class="app-icon" onclick="initGame2()">2. Gece & Gündüz</div>
-            <div class="app-icon" onclick="alert('1 nolu oyun yakında eklenecek!')">1. Oyun</div>
+            <div class="app-icon" onclick="initGame4()">4. Hafıza Kartları (4 Puan)</div>
+            <div class="app-icon" onclick="initGame3()">3. Bul Karayı (3 Puan)</div>
+            <div class="app-icon" onclick="initGame2()">2. Gece & Gündüz (2 Puan)</div>
+            <div class="app-icon" onclick="showScreen('game1-screen')">1. Kalp Dokunuşu (1 Puan)</div>
+            
+            <!-- MAVİ KALP BARI -->
+            <div id="blue-heart-bar" class="heart-bar" onclick="openBlueHeart()">
+                <span id="heart-text">💙 Kilitli (0/10 Puan)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- OYUN 1 EKRANI -->
+    <div id="game1-screen" class="screen">
+        <div class="game-header">
+            <span>Oyun 1</span>
+            <button class="back-btn" onclick="showScreen('home-screen')">Geri</button>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:80%; text-align:center; padding:20px;">
+            <h3>💙 Mavi Kalbe Dokun!</h3><br>
+            <div style="font-size: 80px; cursor: pointer; user-select: none;" onclick="completeGame(1, 1)">💙</div>
         </div>
     </div>
 
@@ -129,6 +175,7 @@
 
 <script>
     let totalScore = 0;
+    let wonGames = { 1: false, 2: false, 3: false, 4: false };
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -151,11 +198,44 @@
         }
     }
 
-    function addScore(points) {
-        totalScore += points;
-        document.getElementById('totalScore').innerText = totalScore;
-        alert(`Tebrikler! ${points} Puan Kazandın. Toplam Puan: ${totalScore}`);
+    // --- TEK SEFERLİK PUAN KAZANMA SİSTEMİ ---
+    function completeGame(gameNum, points) {
+        if (!wonGames[gameNum]) {
+            wonGames[gameNum] = true;
+            totalScore += points;
+            document.getElementById('totalScore').innerText = totalScore;
+            alert(`Tebrikler! ${points} Puan Kazandın. Toplam Puan: ${totalScore}`);
+            checkBlueHeartUnlock();
+        } else {
+            alert("Tebrikler! Oyunu kazandın. (Bu oyunun puanını daha önce aldığın için puan eklenmedi)");
+        }
         showScreen('home-screen');
+    }
+
+    // --- MAVİ KALP BARI KONTROLÜ & KİLİT AÇMA ---
+    function checkBlueHeartUnlock() {
+        let heartBar = document.getElementById('blue-heart-bar');
+        let heartText = document.getElementById('heart-text');
+        if (totalScore >= 10) {
+            heartBar.classList.add('unlocked');
+            heartText.innerText = "💙 Mavi Kalp (Kilit Açıldı - Tıkla)";
+        } else {
+            heartText.innerText = `💙 Kilitli (${totalScore}/10 Puan)`;
+        }
+    }
+
+    async function openBlueHeart() {
+        if (totalScore < 10) {
+            alert(`Mavi Kalp henüz kilitli! Kilidi açmak için 10 puana ulaşmalısın. (${totalScore}/10 Puan)`);
+            return;
+        }
+        try {
+            let res = await fetch('mavi_kalp.txt');
+            let text = await res.text();
+            alert(`💙 MAVİ KALP MESAJI 💙\n\n${text}`);
+        } catch(e) {
+            alert("mavi_kalp.txt dosyası okunamadı veya yerel sunucu bağlantısı yok!");
+        }
     }
 
     // --- OYUN 4: HAFIZA KARTI ---
@@ -211,8 +291,7 @@
                 g4_matchedCount += 2;
                 g4_flipped = [];
                 
-                // yanlis-kart haric 5 çift (10 kart) eşleştiğinde tamamlanır
-                if (g4_matchedCount === 10) addScore(4);
+                if (g4_matchedCount === 10) completeGame(4, 4);
             }
         } else {
             card1.style.backgroundImage = "url('kart-arka-yuz.png')";
@@ -271,7 +350,7 @@
 
         setTimeout(() => {
             if (card.dataset.src === targetCard) {
-                addScore(3);
+                completeGame(3, 3);
             } else {
                 alert("Yanlış kart! Baştan başlıyor.");
                 initGame3();
@@ -279,7 +358,7 @@
         }, 500);
     }
 
-    // --- OYUN 2: GECE GÜNDÜZ (ELENME MODU) ---
+    // --- OYUN 2: GECE GÜNDÜZ ---
     let chars = ['cahit', 'zuana', 'fare', 'keci', 'kedi', 'tavsan', 'zurafa', 'horoz'];
     let activeChars = [];
     let g2_interval;
@@ -325,7 +404,6 @@
         chars.forEach(c => {
             if (!activeChars.includes(c) || c === 'zuana') return;
             
-            // Diğer hayvanların hata yapma şansı (~%30 hata)
             let charState = Math.random() > 0.3 ? g2_currentCommand : (g2_currentCommand === 'gunduz' ? 'gece' : 'gunduz');
             let img = document.getElementById(`img-${c}`);
             img.style.backgroundImage = `url('${c}-${charState}.png')`;
@@ -338,7 +416,6 @@
     function checkSurvival2() {
         if(!document.getElementById('game2-screen').classList.contains('active')) return;
 
-        // 1. Zuana kontrolü
         if (zuanaState !== g2_currentCommand) {
             document.getElementById('img-zuana').classList.add('eliminated');
             alert("Zuana yanlış hamle yaptı ve elendi! Oyun Bitti.");
@@ -346,7 +423,6 @@
             return;
         }
 
-        // 2. Diğer hayvanların kontrolü & elenmesi
         let newlyEliminated = [];
         activeChars.forEach(c => {
             if (c === 'zuana') return;
@@ -359,10 +435,8 @@
 
         activeChars = activeChars.filter(c => !newlyEliminated.includes(c));
 
-        // 3. Kazanan kontrolü (Sadece Zuana kaldı mı?)
         if (activeChars.length === 1 && activeChars[0] === 'zuana') {
-            alert("Tebrikler! Zuana tüm rakiplerini eleyerek tek kaldı!");
-            addScore(2);
+            completeGame(2, 2);
         } else {
             setTimeout(nextRound2, 1200);
         }
@@ -375,3 +449,4 @@
 </script>
 </body>
 </html>
+
