@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; }
         
-        /* Telefon Kasası (Duvar kağıdı oranına dokunulmadı) */
+        /* Telefon Kasası */
         #phone {
             width: 360px; height: 640px;
             background: url('duvar-kagidi.jpg') no-repeat center center;
@@ -44,19 +44,26 @@
         .game-header { width: 100%; padding: 15px; display: flex; justify-content: space-between; background: rgba(0,0,0,0.8); align-items: center;}
         .back-btn { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        /* Oyun 4 (Eşleştirme) - 3:5 Dikey Oran */
+        /* Oyun 4 (Eşleştirme) */
         #game4-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; width: 100%; max-height: 520px; overflow-y: auto; }
         .card { width: 100%; aspect-ratio: 3/5; background: #555; border-radius: 8px; cursor: pointer; background-size: cover; background-position: center; }
         
-        /* Oyun 3 (Bul Karayı Al Parayı) - 3:5 Dikey Oran */
-        #game3-area { display: flex; justify-content: center; gap: 10px; padding: 20px; width: 100%; margin-top: 30px; }
-        .card3 { width: 30%; aspect-ratio: 3/5; background: url('kart-arka-yuz.png'); background-size: cover; background-position: center; border-radius: 10px; cursor: pointer; transition: transform 0.5s; }
+        /* Oyun 3 (Bul Karayı Al Parayı) - 9:16 Dikey Oran & Animasyon */
+        #game3-area { display: flex; justify-content: center; gap: 12px; padding: 20px; width: 100%; margin-top: 30px; }
+        .card3 { width: 28%; aspect-ratio: 9/16; background: url('kart-arka-yuz.png'); background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; transition: transform 0.4s ease-in-out; }
+        .shuffling { animation: shuffleAnim 0.4s ease-in-out infinite alternate; }
+        @keyframes shuffleAnim {
+            0% { transform: translateY(0) scale(1) rotate(0deg); }
+            50% { transform: translateY(-15px) scale(1.05) rotate(4deg); }
+            100% { transform: translateY(15px) scale(0.95) rotate(-4deg); }
+        }
         .msg-text { margin-top: 20px; font-size: 18px; text-align: center; padding: 0 10px; }
 
-        /* Oyun 2 (Gece/Gündüz) - 3:5 Dikey Oran */
+        /* Oyun 2 (Gece/Gündüz) - Elenme & Siyah-Beyaz Efekti */
         #game2-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; width: 100%; }
         .char-box { text-align: center; font-size: 11px; font-weight: bold; }
-        .char-img { width: 100%; aspect-ratio: 3/5; background-size: cover; background-position: center; border-radius: 6px; background-color: #333; }
+        .char-img { width: 100%; aspect-ratio: 3/5; background-size: cover; background-position: center; border-radius: 6px; background-color: #333; transition: filter 0.5s ease, opacity 0.5s ease; }
+        .char-img.eliminated { filter: grayscale(100%); opacity: 0.3; }
         #g2-command { font-size: 28px; font-weight: bold; margin: 10px 0; letter-spacing: 2px;}
         .g2-controls { display: flex; gap: 15px; margin-top: 10px; }
         .g2-btn { padding: 12px 25px; font-size: 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold;}
@@ -203,7 +210,9 @@
                 card2.classList.add('matched');
                 g4_matchedCount += 2;
                 g4_flipped = [];
-                if (g4_matchedCount === g4_cards.length) addScore(4);
+                
+                // yanlis-kart haric 5 çift (10 kart) eşleştiğinde tamamlanır
+                if (g4_matchedCount === 10) addScore(4);
             }
         } else {
             card1.style.backgroundImage = "url('kart-arka-yuz.png')";
@@ -239,15 +248,19 @@
         setTimeout(() => {
             msg.innerText = "Karıştırılıyor...";
             let cardsDom = document.querySelectorAll('.card3');
-            cardsDom.forEach(c => c.style.backgroundImage = "url('kart-arka-yuz.png')");
+            cardsDom.forEach(c => {
+                c.style.backgroundImage = "url('kart-arka-yuz.png')";
+                c.classList.add('shuffling');
+            });
             
             setTimeout(() => {
                 for (let i = area.children.length; i >= 0; i--) {
                     area.appendChild(area.children[Math.random() * i | 0]);
                 }
+                cardsDom.forEach(c => c.classList.remove('shuffling'));
                 msg.innerText = "Hangi kart BUGÜN?";
                 g3_canClick = true;
-            }, 1000);
+            }, 1500);
         }, 2000);
     }
 
@@ -266,14 +279,16 @@
         }, 500);
     }
 
-    // --- OYUN 2: GECE GÜNDÜZ ---
+    // --- OYUN 2: GECE GÜNDÜZ (ELENME MODU) ---
     let chars = ['cahit', 'zuana', 'fare', 'keci', 'kedi', 'tavsan', 'zurafa', 'horoz'];
+    let activeChars = [];
     let g2_interval;
     let g2_currentCommand = '';
     let zuanaState = 'gunduz';
     
     function initGame2() {
         showScreen('game2-screen');
+        activeChars = [...chars];
         renderGame2Grid();
         zuanaState = 'gunduz';
         document.getElementById('g2-command').innerText = "HAZIR OL...";
@@ -293,7 +308,10 @@
 
     function setZuanaState(state) {
         zuanaState = state;
-        document.getElementById('img-zuana').style.backgroundImage = `url('zuana-${state}.png')`;
+        let imgZuana = document.getElementById('img-zuana');
+        if (imgZuana && !imgZuana.classList.contains('eliminated')) {
+            imgZuana.style.backgroundImage = `url('zuana-${state}.png')`;
+        }
     }
 
     function nextRound2() {
@@ -305,22 +323,48 @@
         cmdText.style.color = g2_currentCommand === 'gunduz' ? "#f1c40f" : "#fff";
 
         chars.forEach(c => {
-            if (c === 'zuana') return;
-            let charState = Math.random() > 0.1 ? g2_currentCommand : (g2_currentCommand === 'gunduz' ? 'gece' : 'gunduz');
-            document.getElementById(`img-${c}`).style.backgroundImage = `url('${c}-${charState}.png')`;
+            if (!activeChars.includes(c) || c === 'zuana') return;
+            
+            // Diğer hayvanların hata yapma şansı (~%30 hata)
+            let charState = Math.random() > 0.3 ? g2_currentCommand : (g2_currentCommand === 'gunduz' ? 'gece' : 'gunduz');
+            let img = document.getElementById(`img-${c}`);
+            img.style.backgroundImage = `url('${c}-${charState}.png')`;
+            img.dataset.state = charState;
         });
 
-        g2_interval = setTimeout(checkSurvival2, 1500);
+        g2_interval = setTimeout(checkSurvival2, 1600);
     }
 
     function checkSurvival2() {
         if(!document.getElementById('game2-screen').classList.contains('active')) return;
 
+        // 1. Zuana kontrolü
         if (zuanaState !== g2_currentCommand) {
-            alert("Yanlış hamle! Zuana elendi. Oyun Bitti!");
+            document.getElementById('img-zuana').classList.add('eliminated');
+            alert("Zuana yanlış hamle yaptı ve elendi! Oyun Bitti.");
             endGame2();
+            return;
+        }
+
+        // 2. Diğer hayvanların kontrolü & elenmesi
+        let newlyEliminated = [];
+        activeChars.forEach(c => {
+            if (c === 'zuana') return;
+            let img = document.getElementById(`img-${c}`);
+            if (img.dataset.state !== g2_currentCommand) {
+                img.classList.add('eliminated');
+                newlyEliminated.push(c);
+            }
+        });
+
+        activeChars = activeChars.filter(c => !newlyEliminated.includes(c));
+
+        // 3. Kazanan kontrolü (Sadece Zuana kaldı mı?)
+        if (activeChars.length === 1 && activeChars[0] === 'zuana') {
+            alert("Tebrikler! Zuana tüm rakiplerini eleyerek tek kaldı!");
+            addScore(2);
         } else {
-            nextRound2();
+            setTimeout(nextRound2, 1200);
         }
     }
 
