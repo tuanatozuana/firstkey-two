@@ -128,24 +128,19 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- ŞİFRE KONTROLÜ ---
+    // --- ŞİFRE KONTROLÜ (password.txt dosyasından okur) ---
     async function checkPassword() {
         let input = document.getElementById('passInput').value;
         try {
             let res = await fetch('password.txt');
             let pass = await res.text();
-            if(input === pass.trim()) {
+            if(input.trim() === pass.trim()) {
                 showScreen('home-screen');
             } else {
                 alert("Yanlış Şifre!");
             }
         } catch(e) {
-            console.warn("Dosya okunamadı. Test şifresi '1234' deneniyor.");
-            if(input === '1234') {
-                showScreen('home-screen');
-            } else {
-                alert("Yerel sunucu algılanamadı ve test şifresi de (1234) yanlış!");
-            }
+            alert("password.txt dosyası okunamadı veya yerel sunucu bağlantısı yok!");
         }
     }
 
@@ -169,7 +164,6 @@
         let grid = document.getElementById('game4-grid');
         grid.innerHTML = '';
         
-        // Kartları çiftle ve karıştır
         g4_cards = [...g4_images, ...g4_images].sort(() => Math.random() - 0.5);
 
         g4_cards.forEach((src, index) => {
@@ -177,7 +171,7 @@
             card.className = 'card';
             card.dataset.src = src;
             card.dataset.index = index;
-            card.style.backgroundImage = "url('3/kart-arka-yuz.png')"; // Kapalı yüz
+            card.style.backgroundImage = "url('3/kart-arka-yuz.png')";
             card.onclick = () => flipCard4(card);
             grid.appendChild(card);
         });
@@ -202,11 +196,9 @@
 
         if (src1 === src2) {
             if (src1.includes('yanlis-kart.png')) {
-                // Sadece yanlis-kart eşleşirse oyun baştan başlar
                 alert("Yanlış kartlar eşleşti! Oyun baştan başlıyor.");
                 initGame4();
             } else {
-                // Diğer doğru eşleşmelerde oyun devam eder
                 card1.classList.add('matched');
                 card2.classList.add('matched');
                 g4_matchedCount += 2;
@@ -214,7 +206,6 @@
                 if (g4_matchedCount === g4_cards.length) addScore(4);
             }
         } else {
-            // Eşleşmeyen kartlar tekrar kapanır
             card1.style.backgroundImage = "url('3/kart-arka-yuz.png')";
             card2.style.backgroundImage = "url('3/kart-arka-yuz.png')";
             g4_flipped = [];
