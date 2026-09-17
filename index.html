@@ -74,6 +74,57 @@
             z-index: 1;
         }
 
+        /* YERDEKİ TELEFON */
+        .phone-3d {
+            position: absolute;
+            top: 72%;
+            left: 28%;
+            width: 26px;
+            height: 50px;
+            background: #1a1a1a;
+            border: 1.5px solid #555;
+            border-radius: 6px;
+            transform: scaleY(-1) rotate(-45deg) translateZ(2px);
+            cursor: pointer;
+            z-index: 15;
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.6);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 3px 2px;
+        }
+        .phone-3d:hover {
+            filter: brightness(1.3);
+            transform: scaleY(-1) rotate(-45deg) translateZ(10px) scale(1.15);
+        }
+        .phone-screen {
+            width: 100%;
+            height: 82%;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 4px rgba(255,255,255,0.2);
+        }
+        .phone-notch {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 2px;
+            background: #000;
+            border-radius: 2px;
+        }
+        .phone-home-btn {
+            width: 5px;
+            height: 5px;
+            border: 1px solid #777;
+            border-radius: 50%;
+        }
+
         /* TABLO */
         .picture-frame {
             position: absolute;
@@ -748,6 +799,14 @@
         <div class="panel floor" id="roomFloor">
             <div class="zuana-3d" id="zuana3d">
                 <img src="zuana.png" alt="Zuana" class="zuana-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/70/ffc300/000?text=Zuana';">
+            </div>
+
+            <!-- YERDEKİ TELEFON -->
+            <div class="phone-3d" onclick="navigateTo('telefon.html')" title="Telefon">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                </div>
+                <div class="phone-home-btn"></div>
             </div>
         </div>
 
