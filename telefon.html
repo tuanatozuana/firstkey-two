@@ -50,7 +50,7 @@
         
         /* Oyun 3 (Bul Karayı Al Parayı) */
         #game3-area { display: flex; justify-content: center; gap: 10px; padding: 20px; width: 100%; margin-top: 50px; }
-        .card3 { width: 30%; aspect-ratio: 2/3; background: url('3/kart-arka-yuz.png'); background-size: cover; border-radius: 10px; cursor: pointer; transition: transform 0.5s; }
+        .card3 { width: 30%; aspect-ratio: 2/3; background: url('kart-arka-yuz.png'); background-size: cover; border-radius: 10px; cursor: pointer; transition: transform 0.5s; }
         .msg-text { margin-top: 20px; font-size: 18px; text-align: center; padding: 0 10px; }
 
         /* Oyun 2 (Gece/Gündüz) */
@@ -128,7 +128,7 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- ŞİFRE KONTROLÜ (password.txt dosyasından okur) ---
+    // --- ŞİFRE KONTROLÜ (Aynı dizindeki password.txt) ---
     async function checkPassword() {
         let input = document.getElementById('passInput').value;
         try {
@@ -152,7 +152,7 @@
     }
 
     // --- OYUN 4: HAFIZA KARTI ---
-    let g4_images = ['4/besinci-mevsim.jpg', '4/yanlis-kart.png', '4/kis.jpeg', '4/yaz.jpg', '4/ilkbahar.jpg', '4/sonbahar.jpg'];
+    let g4_images = ['besinci-mevsim.jpg', 'yanlis-kart.png', 'kis.jpeg', 'yaz.jpg', 'ilkbahar.jpg', 'sonbahar.jpg'];
     let g4_cards = [];
     let g4_flipped = [];
     let g4_matchedCount = 0;
@@ -171,7 +171,7 @@
             card.className = 'card';
             card.dataset.src = src;
             card.dataset.index = index;
-            card.style.backgroundImage = "url('3/kart-arka-yuz.png')";
+            card.style.backgroundImage = "url('kart-arka-yuz.png')";
             card.onclick = () => flipCard4(card);
             grid.appendChild(card);
         });
@@ -206,15 +206,15 @@
                 if (g4_matchedCount === g4_cards.length) addScore(4);
             }
         } else {
-            card1.style.backgroundImage = "url('3/kart-arka-yuz.png')";
-            card2.style.backgroundImage = "url('3/kart-arka-yuz.png')";
+            card1.style.backgroundImage = "url('kart-arka-yuz.png')";
+            card2.style.backgroundImage = "url('kart-arka-yuz.png')";
             g4_flipped = [];
         }
     }
 
     // --- OYUN 3: BUL KARAYI ---
-    let g3_images = ['3/yarin.jpg', '3/bugun.jpg', '3/dun.jpg'];
-    let targetCard = '3/bugun.jpg';
+    let g3_images = ['yarin.jpg', 'bugun.jpg', 'dun.jpg'];
+    let targetCard = 'bugun.jpg';
     let g3_canClick = false;
 
     function initGame3() {
@@ -239,7 +239,7 @@
         setTimeout(() => {
             msg.innerText = "Karıştırılıyor...";
             let cardsDom = document.querySelectorAll('.card3');
-            cardsDom.forEach(c => c.style.backgroundImage = "url('3/kart-arka-yuz.png')");
+            cardsDom.forEach(c => c.style.backgroundImage = "url('kart-arka-yuz.png')");
             
             setTimeout(() => {
                 for (let i = area.children.length; i >= 0; i--) {
@@ -286,14 +286,14 @@
         chars.forEach(c => {
             let div = document.createElement('div');
             div.className = 'char-box';
-            div.innerHTML = `<div class="char-img" id="img-${c}" style="background-image:url('2/${c}-gunduz.png')"></div><br>${c.toUpperCase()}`;
+            div.innerHTML = `<div class="char-img" id="img-${c}" style="background-image:url('${c}-gunduz.png')"></div><br>${c.toUpperCase()}`;
             grid.appendChild(div);
         });
     }
 
     function setZuanaState(state) {
         zuanaState = state;
-        document.getElementById('img-zuana').style.backgroundImage = `url('2/zuana-${state}.png')`;
+        document.getElementById('img-zuana').style.backgroundImage = `url('zuana-${state}.png')`;
     }
 
     function nextRound2() {
@@ -307,7 +307,7 @@
         chars.forEach(c => {
             if (c === 'zuana') return;
             let charState = Math.random() > 0.1 ? g2_currentCommand : (g2_currentCommand === 'gunduz' ? 'gece' : 'gunduz');
-            document.getElementById(`img-${c}`).style.backgroundImage = `url('2/${c}-${charState}.png')`;
+            document.getElementById(`img-${c}`).style.backgroundImage = `url('${c}-${charState}.png')`;
         });
 
         g2_interval = setTimeout(checkSurvival2, 1500);
